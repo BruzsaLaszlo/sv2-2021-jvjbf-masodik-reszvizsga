@@ -15,13 +15,17 @@ public class City {
     }
 
     public Building findHighestBuilding() {
-        Building highest = buildings.get(0);
-        for (Building building : buildings) {
-            if (highest.getLevels() < building.getLevels()) {
-                highest = building;
+        if (!buildings.isEmpty()) {
+            Building highest = buildings.get(0);
+            for (Building building : buildings) {
+                if (highest.getLevels() < building.getLevels()) {
+                    highest = building;
+                }
             }
+            return highest;
+        } else {
+            throw new IllegalStateException("no buildings in the city");
         }
-        return highest;
     }
 
     public List<Building> findBuildingsByStreet(String street) {
