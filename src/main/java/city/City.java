@@ -3,6 +3,8 @@ package city;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Comparator.comparingInt;
+
 public class City {
 
     private final String name;
@@ -15,52 +17,33 @@ public class City {
     }
 
     public Building findHighestBuilding() {
-        if (!buildings.isEmpty()) {
-            Building highest = buildings.get(0);
-            for (Building building : buildings) {
-                if (highest.getLevels() < building.getLevels()) {
-                    highest = building;
-                }
-            }
-            return highest;
-        } else {
-            throw new IllegalStateException("no buildings in the city");
-        }
+        return buildings.stream()
+                .max(comparingInt(Building::getLevels))
+                .orElseThrow(() -> new IllegalStateException("no buildings in the city"));
     }
 
     public List<Building> findBuildingsByStreet(String street) {
-        List<Building> result = new ArrayList<>();
-        for (Building building : buildings) {
-            if (building.getAddress().getStreet().equals(street)) {
-                result.add(building);
-            }
-        }
-        return result;
+        return buildings.stream()
+                .filter(building -> building.getAddress().getStreet().equals(street))
+                .toList();
     }
 
     public boolean isThereBuildingWithMorePeopleThan(int number) {
-        for (Building building : buildings) {
-            if (building.calculateNumberOfPeopleCanFit() > number) {
-                return true;
-            }
-        }
-        return false;
+        return buildings.stream()
+                .anyMatch(building -> building.calculateNumberOfPeopleCanFit() > number);
     }
 
     public void addBuilding(Building building) {
-        if (getAreaOfBuildings() + building.getArea() <= fullArea) {
-            buildings.add(building);
-        } else {
+        if (getAreaOfBuildings() + building.getArea() > fullArea) {
             throw new IllegalArgumentException("City can't be larger than " + fullArea);
         }
+        buildings.add(building);
     }
 
     private double getAreaOfBuildings() {
-        double sum = 0;
-        for (Building building : buildings) {
-            sum += building.getArea();
-        }
-        return sum;
+        return buildings.stream()
+                .mapToDouble(Building::getArea)
+                .sum();
     }
 
 

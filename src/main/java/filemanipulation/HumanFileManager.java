@@ -12,10 +12,11 @@ public class HumanFileManager {
 
     public void readHumansFromFile(Path path) {
         try {
-            for (String line : Files.readAllLines(path)) {
-                String[] s = line.split(";");
-                humans.add(new Human(s[0], s[1]));
-            }
+            Files.readAllLines(path)
+                    .forEach(line -> {
+                        String[] s = line.split(";");
+                        humans.add(new Human(s[0], s[1]));
+                    });
         } catch (IOException e) {
             throw new IllegalStateException("Can't read file!", e);
         }
@@ -30,14 +31,12 @@ public class HumanFileManager {
     }
 
     private List<String> getMen() {
-        List<String> men = new ArrayList<>();
-        for (Human human : humans) {
-            if (isMan(human)) {
-                men.add(human.getName() + ";" + human.getIdentityNumber());
-            }
-        }
-        return men;
+        return humans.stream()
+                .filter(this::isMan)
+                .map(human -> human.getName() + ";" + human.getIdentityNumber())
+                .toList();
     }
+
 
     private boolean isMan(Human human) {
         return human.getIdentityNumber().startsWith("1") || human.getIdentityNumber().startsWith("3");
